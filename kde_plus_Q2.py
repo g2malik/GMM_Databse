@@ -12,21 +12,14 @@ from scipy.stats import gaussian_kde
 from scipy.signal import find_peaks
 from scipy.signal import peak_prominences
 from matplotlib.pyplot import figure
-from scipy.integrate import simps
  
 class kde_plus_Q2():
-    def __init__(self,XY,U_grid,V_grid,W_grid,U_hist,staz,binbin,jy,time_stamp,testing_file, delta_points, btfti, TT):      
-        rsl = 500
-        bins = binbin
-        figure(figsize=(6.0, 4.0), dpi=rsl)
-        
-        y_event_height = int(2)
-        #print(y_event_height)
+    def __init__(self,XY,U_grid,V_grid,W_grid,U_hist,staz,binbin,jy,time_stamp,testing_file, delta_points):      
         
         data = np.reshape(U_hist,(1,-1))
         xx = np.linspace(np.min(data),np.max(data),500) #Evenly distributed velocity for the distribution curves only
         xx_interval = (np.max(data) - np.min(data))/500
-        thre =[np.arange(0.039,0.040,0.001)][0]
+        
                 
         # ============ kde ============  
         bandwidth = (data.shape[1]**(-1/5))/1.65 #Slightly smaller than Scotts
@@ -35,23 +28,12 @@ class kde_plus_Q2():
 
         pks, props = find_peaks(kernel.evaluate(xx), distance = dist, height = 0.5, prominence = 0.01) #Evaluate Method gives the y values for given x values so can plot the x vs evaluted values to plot the function
         xpk = [xx[jj] for jj in pks] #Finds x-cordinates of the peaks. The indexes of the peaks were found above
-        pk_std = np.std(props["peak_heights"])
-        pk_prominence = np.mean(props["prominences"])
-        
-        if pk_std >= 1.42 or (pk_prominence >= 1.8 and pk_std >= 1.2): #Criteria to classify if the snapshot has coherent UMZs
-            self.coherent = True
-        else:
-            self.coherent = False
-                        
+        self.prominence = np.mean(props["prominences"])
+                                
         
         nop = len(xpk) #Finds number of peaks and adds more if needed
         ypk = [kernel.evaluate(xx[jj]) for jj in pks] #Finds the the y value of the peaks
         xpk_sorted = -np.sort(-np.array(xpk)) # in decsending order   
-        
-        
-        plt.hist(data.T,bins,density=True, edgecolor='grey',facecolor='none')# PLots the velocity pdf
-        plt.plot(xx,kernel.evaluate(xx),'k-',label='kernal density estimation(KDE)') #Plots the calculated pdf curve
-        plt.scatter(xpk,ypk,c="r",s=80,marker="o",label='peaks of KDE')  #Plots the peaks from the KDE
         
         # ============ gmm ============  
         N = np.arange(1, nop+1) #An array of possible number of UMZs based on no.of peaks from KDE 
@@ -78,38 +60,46 @@ class kde_plus_Q2():
         self.N_best = N[np.argmin(BIC)]  ## number of kernels/gaussian   components in best model
        
         self.means_g = [] #Found means from GMM algorithm not the spatial UMZ
-        self.cov_g = [] #covariances or width of gaussians
+        self.std_g = [] #covariances or width of gaussians
+        self.weights_g = list(M_best.weights_) #Total Probability of being in any of the UMZs
+        
         self.spanwise = [] #Average Spanwise velocity of spatial UMZ rather than the Gaussian model
         self.height = []
        
         for ij in range(self.N_best):
-            self.cov_g.append(M_best.covariances_[ij][0][0]) #Converting the resulting multidimensional array with empty dimensions to 1D
+            self.std_g.append(np.sqrt(M_best.covariances_[ij][0][0])) #Converting the resulting multidimensional array with empty dimensions to 1D
             self.means_g.append(M_best.means_[ij][0]) #The result is a multidimensional array but only has values in one of the dimensions
 
             self.spanwise.append(np.mean(W_wall[labels == ij]))
             self.height.append(np.mean(Y_wall[labels == ij]))
         
         self.means_g.reverse()
-        self.cov_g.reverse()
+        self.std_g.reverse()
+        self.weights_g.reverse()
         self.spanwise.reverse()
         self.height.reverse()
         
-        #print(self.spanwise)
-        #print(self.height)
+
         
         self.peaks_g = M_best.predict_proba(np.reshape(self.means_g, (-1, 1))) * np.exp(M_best.score_samples(np.reshape(self.means_g, (-1, 1))))[:, np.newaxis] #Does the same thing as finding pdf_individual in one line but for the mean values only
         
         self.peaks_g = self.peaks_g.max(axis = 1)
         
-
         
+        rsl = 500
+        bins = binbin
+        figure(figsize=(6.0, 4.0), dpi=rsl)
+        plt.hist(data.T,bins,density=True, edgecolor='grey',facecolor='none')# PLots the velocity pdf
+        plt.plot(xx,kernel.evaluate(xx),'k-',label='kernal density estimation(KDE)') #Plots the calculated pdf curve
+        plt.scatter(xpk,ypk,c="r",s=80,marker="o",label='peaks of KDE')  #Plots the peaks from the KDE
+
+
         logprob = M_best.score_samples(xx.reshape(-1, 1))
         responsibilities = M_best.predict_proba(xx.reshape(-1, 1))
         pdf = np.exp(logprob)
         pdf_individual = responsibilities * pdf[:, np.newaxis] #The newaxis just makes the pdf it a column vector because you need to multiply it with the probabilities which are arranged in a column fashion
-        self.areas_g = [simps(pdf_individual[:,i], xx) for i in range(self.N_best)] #Finds areas below individual pdf
-        self.areas_g.reverse()
 
+        
         #plt.plot(xx,pdf,'-',label='Gaussian Mixture Estimation')
         plt.plot(xx,pdf_individual,'--',label='individual Gaussian component')
         #plt.figtext(1,0,"std: %.2f prom: %.2f %s"%(np.std(props["peak_heights"]), np.mean(props["prominences"]), self.coherent), ha="center", fontsize=7)
@@ -138,10 +128,11 @@ class kde_plus_Q2():
         plt.show()
         plt.close()
         
-        """
+        
         # ===== Contour snapshot of flow ======
         figure(figsize=(11.25, 4.5), dpi=1000)
         levs = np.linspace(0.55,1.1,250)
+        thre =[np.arange(0.039,0.040,0.001)][0]
         stream = plt.contourf(XY[0][:delta_points,:],XY[1][:delta_points,:],U_wall,levs, cmap=plt.cm.jet)
         plt.contour(XY[0][:delta_points][:],XY[1][:delta_points][:delta_points],labels,2,colors='k', linewidths = 0.6, linestyles = 'dashed', alpha=0.5)
 
@@ -155,11 +146,12 @@ class kde_plus_Q2():
         #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/temporal_coherence/Results/0 x#%d/010%s stream snapshot X#%d Zlabel %d.png'%(jy,time_stamp,jy,staz), facecolor='w')
         plt.show()
         plt.close()
-        """
+        
 
         """
         #Gives a graph for the profile with respect to x at a specific height. So can find a peak rather than the average
         figure(figsize=(6.0, 2.0), dpi=rsl)
+        y_event_height = int(2)
         plt.plot(XY[0][y_event_height][:], U_grid[y_event_height,:])
         plt.xlabel("x")
         plt.ylabel("Streamwise Velocity")
