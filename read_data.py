@@ -22,6 +22,9 @@ LOG = 140
 DELTA = 265
 
 # ------ Read data from file ------
+start = time.perf_counter()
+
+
 path = '/gpfs/fs0/scratch/j/jphickey/jphickey/Boundary_Layer_PNAS_2017/'
 testing_file = '/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/GMM_Database/test.dat' # temporary file for debugging
 test = open(testing_file, "w")
@@ -47,29 +50,29 @@ for z_plane in range(0,510,10):  #Jinyuan used 10, I had 50 before
     q = open(quadrant, "w") #Includes stuff about the quadrant event
 
     g.write("t:%d "%(start_t))
-    g.write("z:%d "%(x_plane+1))
-    g.write("x:%d "%(z_plane))
+    g.write("x:%d "%(x_plane+1))
+    g.write("z:%d "%(z_plane))
     g.write("\n")
 
     s.write("t:%d "%(start_t))
-    s.write("z:%d "%(x_plane+1))
-    s.write("x:%d "%(z_plane))
+    s.write("x:%d "%(x_plane+1))
+    s.write("z:%d "%(z_plane))
     s.write("\n")
 
     q.write("t:%d "%(start_t))
-    q.write("z:%d "%(x_plane+1))
-    q.write("x:%d "%(z_plane))
+    q.write("x:%d "%(x_plane+1))
+    q.write("z:%d "%(z_plane))
     q.write("\n")
 
   
         
     x_shift = 0 #Amount the whole BL moves in the next snapshot
 
-    for time in range (start_t,37):
-        time_stamp = '%02d' %(time)
+    for snap in range (start_t,37):
+        time_stamp = '%02d' %(snap)
         fname = path + 'restart_010' + time_stamp + '_ydelta_adrian_scalar_omega_uvw_08240_10565.dat'
         f = open (fname, mode = 'r') 
-        print('--- the %d th snapshot in time ---'%time)
+        print('--- the %d th snapshot in time ---'%snap)
 
         # ----- choose the starting position/parameters -----
         btfti = 0.04 # see Wu, Wallace and Hickey 2019, PoF 
@@ -113,9 +116,9 @@ for z_plane in range(0,510,10):  #Jinyuan used 10, I had 50 before
         # --------------------------------
 
         # ------- get velocity etc -------
-        xy    = [[],[]] # computational grid
-        xx    = []
-        yy    = []
+        xy    = [[],[]] # xod and yod grid
+        xx    = [] #Raw x
+        yy    = [] #Raw y
         uu    = []      # computational grid
         vv    = []      #Actual y cordinate
         ww    = []
@@ -184,8 +187,9 @@ for z_plane in range(0,510,10):  #Jinyuan used 10, I had 50 before
                 lll = TT[i][j]
                 if lll > btfti :
                     uhis.append(UU[i][j]) #uhis doesnt include turbulent region but UU does
-
-        # Calculate next frame)
+        
+        # ----------------------------------
+        # Calculate next frame
         x_next = 1.316070556640625 #x distance between adjascent indices
         dt = 112.5
 
@@ -195,99 +199,18 @@ for z_plane in range(0,510,10):  #Jinyuan used 10, I had 50 before
 
         x_shift = x_shift + int(displacement/x_next)
         
-        # Quadrant Detection
-        # --------------------------------
-        x_raw = np.reshape(xx,(y_interval,x_interval))
+        # ----------------------------------
+        # Process raw Data
+        
         y_raw = np.reshape(yy,(y_interval,x_interval))
         y_delta_raw = np.reshape(xy[1],(y_interval,x_interval))
         x_delta_raw = np.reshape(xy[0],(y_interval,x_interval))
         u_raw = np.reshape(uu,(y_interval,x_interval))
         v_raw = np.reshape(vv,(y_interval,x_interval))
-
-        u_event_profile = np.mean(u_raw[:DELTA-BUFFER,:], axis = 1) #np.mean if averaging othwerise either amin or amax for largest Q2/Q4
-        v_event_profile = np.mean(v_raw[:DELTA-BUFFER,:], axis = 1) #np.mean if averaging othwerise either amin or amax for largest Q2/Q4
-        y_event_profile = y_raw[:DELTA-BUFFER,0]
-        yod_event_profile = np.mean(y_delta_raw[:DELTA-BUFFER,:], axis = 1)
-
-        u_diff_prof = u_event_profile - u_avg #If total profile is being subtracted then mean otherwise event
-        v_diff_prof = v_event_profile
-        y_diff_prof = y_event_profile - y_target
-        print('Mean of y_profile difference is ', np.mean(y_diff_prof))
-        print('Std of y profile is ', np.std(y_diff_prof))
-
-        log_layer_i = LOG-BUFFER #Number of indices until the end of the log layer so this is causing the problems
-
-        uv_diff_prof = u_diff_prof * v_diff_prof
-
-        i_min = np.argmin(uv_diff_prof ) #Index of the strongest Q2/Q4 event or least u'v' value
-        uv_min = np.amin(uv_diff_prof) #u'v' value of the strongest event
-        y_min = y_delta_profile[i_min] #y location of the strongest Q2/Q4
-
-        i_log_min = np.argmin(uv_diff_prof[:,:log_layer_i]) #Index of the strongest event in the log layer
-        uv_log_min = np.amin(uv_diff_prof[:,:log_layer_i]) #u'v' value of the strongest event
-        y_log_min = y_delta_profile[i_log_min]
-
-        if u_diff_prof[i_min] < 0 and uv_min < 0:
-            main_event = 'Q2'
-        elif u_diff_prof[i_min] > 0 and uv_min < 0:
-            main_event = 'Q4'
-        elif uv_min > 0:
-            main_event = 'none'
-            
-        if u_diff_prof[i_log_min] < 0 and uv_log_min < 0:
-            log_event = 'Q2'
-        elif u_diff_prof[i_log_min] > 0 and uv_log_min < 0:
-            log_event = 'Q4'
-        elif uv_log_min > 0:
-            log_event = 'none'
-
-        q.write("%s "%(uv_min))
-        q.write("%s "%(y_min))
-        q.write("%s "%(main_event))
-
-        q.write("%s "%(uv_log_min))
-        q.write("%s "%(y_log_min))
-        q.write("%s "%(log_event))
-        q.write("\n")
-
-        plt.plot(u_diff_prof, yod_event_profile)
-        plt.xlabel("Streamwise Velocity")
-        plt.ylabel("y")
-        #plt.xlim([-0.045,0.045])
-        plt.title("010%02d mean U X#%d at Zlabel = %d"%(ii,x_plane+1,z_plane))
         
-        #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/Q2_Detection/Results/mean/010%02d mean U x#%d Zlabel %d.png'%(ii,x_plane+1,z_plane), facecolor='w')
-        plt.show()
-        plt.close()
+        # -----------------------------------
+        # gmm - main
         
-        plt.plot(v_diff_prof, yod_event_profile)
-        plt.xlabel("Wall-Normal Velocity")
-        plt.ylabel("y")
-        #plt.xlim([-0.02, 0.02])
-        plt.title("010%02d mean V X#%d at Zlabel = %d"%(ii,x_plane+1,z_plane))
-        #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/Q2_Detection/Results/mean/010%02d mean V x#%d Zlabel %d.png'%(ii,x_plane+1,z_plane), facecolor='w')
-        plt.show()
-        plt.close()
-        
-        plt.plot(uv_diff_prof, yod_event_profile)
-        plt.xlabel("u'v'")
-        plt.ylabel("y")
-        #plt.xlim([-0.02, 0.02])
-        plt.title("010%02d U'V' X#%d at Zlabel = %d"%(ii,x_plane+1,z_plane))
-        #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/Q2_Detection/Results/mean/010%02d mean V x#%d Zlabel %d.png'%(ii,x_plane+1,z_plane), facecolor='w')
-        plt.show()
-        plt.close()
-
-        print("Magnitude of event is ", uv_min)
-        print("Postion of event is ", y_min)
-        print("Event name is ", main_event)
-        
-        print("Magnitude of log event is ", uv_log_min)
-        print("Postion of log event is ", y_log_min)
-        print("Log event name is ", log_event)
-
-        # --------------------------------
-        # Q2/Q4 - main
         model = kde_plus_gmm(XY,UU,VV,WW,uhis,z_plane,binbin,x_plane+1,time_stamp,testing_file, delta_points)
         g.write("%d "%(model.N_best))
         g.write("%s "%(model.prominence))
@@ -299,10 +222,6 @@ for z_plane in range(0,510,10):  #Jinyuan used 10, I had 50 before
         q.write("%s "%(model.prominence))
         q.write("%s "%(x_delta_raw[0,0]))
         
-        N_best_list.append(model.N_best)
-        prominence_list.append(model.prominence)
-        frame_start_list.append(x_delta_raw[0,0])
-
         print("Starting x is ",x_delta_raw[0,0])
 
         g.writelines(["%s " %mean for mean in model.means_g])
@@ -316,7 +235,100 @@ for z_plane in range(0,510,10):  #Jinyuan used 10, I had 50 before
         s.write("\n")
         
         # --------------------------------
-          
+        # Quadrant Detection
+
+        u_event_profile = np.mean(u_raw[:DELTA-BUFFER,:], axis = 1) #np.mean if averaging othwerise either amin or amax for largest Q2/Q4
+        v_event_profile = np.mean(v_raw[:DELTA-BUFFER,:], axis = 1) #np.mean if averaging othwerise either amin or amax for largest Q2/Q4
+        y_event_profile = y_raw[:DELTA-BUFFER,0]
+        yod_event_profile = y_delta_raw[:DELTA-BUFFER,int(x_interval/2)] #Take the profile of the middle 
+
+        u_diff_prof = u_event_profile - u_avg #If total profile is being subtracted then mean otherwise event
+        v_diff_prof = v_event_profile
+        y_diff_prof = y_event_profile - y_target
+        print('Mean of y_profile difference is ', np.mean(y_diff_prof))
+        print('Std of y profile is ', np.std(y_diff_prof))
+
+        uv_diff_prof = u_diff_prof * v_diff_prof
+
+        i_min = np.argmin(uv_diff_prof ) #Index of the strongest Q2/Q4 event or least u'v' value
+        uv_min = np.amin(uv_diff_prof) #u'v' value of the strongest event
+        y_min = yod_event_profile[i_min] #y location of the strongest Q2/Q4
+
+
+        if u_diff_prof[i_min] < 0 and uv_min < 0:
+            main_event = 'Q2'
+        elif u_diff_prof[i_min] > 0 and uv_min < 0:
+            main_event = 'Q4'
+        elif uv_min > 0:
+            main_event = 'none'
+            
+
+        q.write("%s "%(uv_min))
+        q.write("%s "%(y_min))
+        q.write("%s "%(main_event))
+        q.write("\n")
+
+        
+        end = time.perf_counter()
+        print(end - start)
+        """
+        log_layer_i = LOG-BUFFER #Number of indices until the end of the log layer so this is causing the problems
+        
+        i_log_min = np.argmin(uv_diff_prof[:log_layer_i]) #Index of the strongest event in the log layer
+        uv_log_min = np.amin(uv_diff_prof[:log_layer_i]) #u'v' value of the strongest event
+        y_log_min = yod_event_profile[i_log_min]
+        
+        if u_diff_prof[i_log_min] < 0 and uv_log_min < 0:
+            log_event = 'Q2'
+        elif u_diff_prof[i_log_min] > 0 and uv_log_min < 0:
+            log_event = 'Q4'
+        elif uv_log_min > 0:
+            log_event = 'none'
+            
+        q.write("%s "%(uv_log_min))
+        q.write("%s "%(y_log_min))
+        q.write("%s "%(log_event))
+        
+        
+        
+        plt.plot(u_diff_prof, yod_event_profile)
+        plt.xlabel("Streamwise Velocity")
+        plt.ylabel("y")
+        #plt.xlim([-0.045,0.045])
+        plt.title("010%02d mean U X#%d at Zlabel = %d"%(snap,x_plane+1,z_plane))
+        
+        #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/Q2_Detection/Results/mean/010%02d mean U x#%d Zlabel %d.png'%(ii,x_plane+1,z_plane), facecolor='w')
+        plt.show()
+        plt.close()
+        
+        plt.plot(v_diff_prof, yod_event_profile)
+        plt.xlabel("Wall-Normal Velocity")
+        plt.ylabel("y")
+        #plt.xlim([-0.02, 0.02])
+        plt.title("010%02d mean V X#%d at Zlabel = %d"%(snap,x_plane+1,z_plane))
+        #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/Q2_Detection/Results/mean/010%02d mean V x#%d Zlabel %d.png'%(ii,x_plane+1,z_plane), facecolor='w')
+        plt.show()
+        plt.close()
+        
+        plt.plot(uv_diff_prof, yod_event_profile)
+        plt.xlabel("u'v'")
+        plt.ylabel("y")
+        #plt.xlim([-0.02, 0.02])
+        plt.title("010%02d U'V' X#%d at Zlabel = %d"%(snap,x_plane+1,z_plane))
+        #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/Q2_Detection/Results/mean/010%02d mean V x#%d Zlabel %d.png'%(ii,x_plane+1,z_plane), facecolor='w')
+        plt.show()
+        plt.close()
+
+        print("Magnitude of event is ", uv_min)
+        print("Postion of event is ", y_min)
+        print("Event name is ", main_event)
+        
+        print("Magnitude of log event is ", uv_log_min)
+        print("Postion of log event is ", y_log_min)
+        print("Log event name is ", log_event)
+        
+        # --------------------------------
+        """
 
 test.close()
 print ('--- End of all ---')

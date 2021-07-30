@@ -11,9 +11,9 @@ from sklearn.mixture import GaussianMixture
 from scipy.stats import gaussian_kde
 from scipy.signal import find_peaks
 from scipy.signal import peak_prominences
-from matplotlib.pyplot import figure
+#from matplotlib.pyplot import figure
  
-class kde_plus_Q2():
+class kde_plus_gmm():
     def __init__(self,XY,U_grid,V_grid,W_grid,U_hist,staz,binbin,jy,time_stamp,testing_file, delta_points):      
         
         data = np.reshape(U_hist,(1,-1))
@@ -81,11 +81,11 @@ class kde_plus_Q2():
         
 
         
-        self.peaks_g = M_best.predict_proba(np.reshape(self.means_g, (-1, 1))) * np.exp(M_best.score_samples(np.reshape(self.means_g, (-1, 1))))[:, np.newaxis] #Does the same thing as finding pdf_individual in one line but for the mean values only
-        
+        #self.peaks_g = M_best.predict_proba(np.reshape(self.means_g, (-1, 1))) * np.exp(M_best.score_samples(np.reshape(self.means_g, (-1, 1))))[:, np.newaxis] #Does the same thing as finding pdf_individual in one line but for the mean values only
+        self.peaks_g = M_best.predict_proba(np.reshape(self.means_g, (-1, 1)))
         self.peaks_g = self.peaks_g.max(axis = 1)
         
-        
+        """
         rsl = 500
         bins = binbin
         figure(figsize=(6.0, 4.0), dpi=rsl)
@@ -146,8 +146,8 @@ class kde_plus_Q2():
         #plt.savefig('/gpfs/fs0/scratch/j/jphickey/g2malik/working_code/temporal_coherence/Results/0 x#%d/010%s stream snapshot X#%d Zlabel %d.png'%(jy,time_stamp,jy,staz), facecolor='w')
         plt.show()
         plt.close()
+        """
         
-
         """
         #Gives a graph for the profile with respect to x at a specific height. So can find a peak rather than the average
         figure(figsize=(6.0, 2.0), dpi=rsl)
