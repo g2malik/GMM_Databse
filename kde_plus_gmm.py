@@ -2,10 +2,10 @@
 # last modifed: gmalik, June, 2021 
 
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
-import h5py
+#import matplotlib
+#import matplotlib.pyplot as plt
+#import pandas as pd
+#import h5py
 
 from sklearn.mixture import GaussianMixture
 from scipy.stats import gaussian_kde
@@ -14,7 +14,7 @@ from scipy.signal import peak_prominences
 #from matplotlib.pyplot import figure
  
 class kde_plus_gmm():
-    def __init__(self,XY,U_grid,V_grid,W_grid,U_hist,staz,binbin,jy,time_stamp,testing_file, delta_points):      
+    def __init__(self,XY,U_grid,V_grid,W_grid,U_hist,staz,binbin,jy,time_stamp, delta_points):      
         
         data = np.reshape(U_hist,(1,-1))
         xx = np.linspace(np.min(data),np.max(data),500) #Evenly distributed velocity for the distribution curves only
