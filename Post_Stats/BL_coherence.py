@@ -13,7 +13,7 @@ import matplotlib as mpl
 from num2words import num2words
 # --------------------------------
 
-fname = r'''C:\Users\gagan\Documents\Work\Results\Temporal Coherence\cumulative_no_UMZ_new.txt'''
+fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
 f = open (fname, mode = 'r')
 one = []
 two = []
@@ -59,9 +59,3 @@ print(len(two))
 print(len(three))  
 print(len(four))
 print(most_coherent)
-
-
-
-
-
-
