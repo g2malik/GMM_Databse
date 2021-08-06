@@ -19,16 +19,15 @@ def find_nearest(array, value):
     return idx,array[idx] #returns tuple of index and value
 
 # --------------------------------
-# find index of same value
-def find_tracker(value):
-    idx = np.where(tracker[:,0] == value)
-    if np.shape(idx)[1] == 1:
-        return idx[0]
-    if np.shape(idx)[1] == 0:
-        return 7 #7 means not present in tracker
-    if np.shape(idx)[1] >1:
-        print("tracker error")    
-
+# update array with new value
+def update_array(value, array):
+    for i in len(array):
+        if i == (len(array) - 1):
+            array[i] = value
+        else:
+            array[i] = array[i+1]
+    return array
+    
 # --------------------------------
 # find next available counter space
 def find_counter_space():
