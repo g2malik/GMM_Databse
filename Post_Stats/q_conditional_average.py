@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl 
 from num2words import num2words
+import copy
 
 # --------------------------------
 # find closest values
@@ -44,6 +45,8 @@ fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
 f = open (fname, mode = 'r')
 spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\spatial.txt'''
 s = open (spatial, mode = 'r')
+quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\quadrant.txt'''
+q = open (quadrant, mode = 'r')
 tol = 0.025
 heights_dist = []
 all_heights = []
@@ -53,13 +56,34 @@ UMZ_order = []
 peaks_old = []
 peaks_current = []
 heights_current = []
+spanwise_current = []
+quadrant_current = 0
+event_current = 0
 
 counter = np.zeros((7,2))  #0: first recorded velocity / 1: # of frames
 tracker = np.zeros(7)
 coherence_dist = []
 
+before_array = []
+during_array =  []
+after_array = []
+
+before_2_array = []
+during_2_array =  []
+after_2_array = []
+
+before_4_array = []
+during_4_array =  []
+after_4_array = []
+
+before =  0
+
+creation = False
+creation_event = 0
+
 for line in f:
-    line2 = s.readline()
+    line_spat = s.readline()
+    line_quad = q.readline()
     if (line.startswith("z") or line.startswith("t"))  == True:
         UMZ_order = []
         peaks_old = []
@@ -67,40 +91,40 @@ for line in f:
         z_coord = line.split()[2]
         z_coord = int(z_coord[2:])
 
-        for jj in range(len(tracker)):
-            if counter[jj,1] > 0:
-                coherence_dist.append(counter[jj,1])
-        counter[:,:] = 0
-        tracker[:] = 0
-
     else:
         lst = line.split()
-        lst2 = line2.split()
+        lst_spat = line_spat.split()
+        lst_quad = line_quad.split()
         UMZs_str = int(lst[0])
-        UMZs_str2 = int(lst2[0])
-        if UMZs_str2 != UMZs_str:
+        UMZs_str2 = int(lst_spat[0])
+        UMZs_str3 = int(lst_quad[0])
+        if (UMZs_str and UMZs_str2) != UMZs_str3:
             print("Wrong Allignment")
         std = lst[1]
         for ii in range(3,3+UMZs_str):
             peaks_current.append(float(lst[ii]))
-            heights_current.append(float(lst2[ii]))
-            all_heights.append(float(lst2[ii]))
-        UMZ_order.append(int(UMZs_str))
+            heights_current.append(float(lst_spat[ii]))
+            all_heights.append(float(lst_spat[ii]))
+        for ii in range(3+UMZs_str, 3+(UMZs_str*2)):
+            spanwise_current.append(float(lst_spat[ii]))
+        
+        quadrant_current = float(lst_quad[3])
+        event_current = lst_quad[5][1]
+        if event_current == 'o':
+            event_current = 0
+        else:
+            event_current = int(event_current)
 
-        #Put code here to check if anything in counter and check if the velocity closes to the value in the tracker is
-        #within tolerance. Then add 1 otherwise end counter and record number of frames
-
-        for jj in range(len(tracker)):
-            if tracker[jj] != 0: #If tracking at this place holder
-                if np.abs(tracker[jj] - find_nearest(peaks_current, tracker[jj])[1]) < tol: #If peak in current coherent with tracker
-                    counter[jj,1] += 1
-                    tracker[jj] = find_nearest(peaks_current, tracker[jj])[1]
-                else:
-                    if counter[jj,1] > 0:
-                        coherence_dist.append(counter[jj,1])
-                    counter[jj,:] = 0
-                    tracker[jj] = 0
-
+            
+        if creation_event == 2:
+            after_2_array.append(quadrant_current)
+            after_array.append(quadrant_current)
+            creation_event = 0
+        
+        if creation_event == 4:
+            after_4_array.append(quadrant_current)
+            after_array.append(quadrant_current)
+            creation_event = 0
 
         new_peaks = []
         new_heights = []
@@ -115,54 +139,49 @@ for line in f:
                 #new_peaks.append(np.abs(np.asarray(peaks_current) - np.asarray(nearest_old_peaks)).argmax()) #includes new close peaks
             
             if len(new_peaks)==1: #If its a creation event if all other are coherent
-                heights_dist.append(new_heights[0])
-                new_space = find_counter_space()
-                counter[new_space,0] = new_peaks[0] #Init counter with first value
-                counter[new_space,1] = 1 #Start counting
-                tracker[new_space] = new_peaks[0] #Update tracker
-
+                creation = True
+                creation_event = event_current
+                if creation_event == 2:
+                    before_2_array.append(before)
+                    during_2_array.append(quadrant_current)
+                    before_array.append(before)
+                    during_array.append(quadrant_current)
+                if creation_event == 4:
+                    before_4_array.append(before)
+                    during_4_array.append(quadrant_current)
+                    before_array.append(before)
+                    during_array.append(quadrant_current)
         
         peaks_old = peaks_current.copy()
         peaks_current = []
         heights_current = []
+        before = copy.deepcopy(quadrant_current)
 
 
-bins_edge = np.linspace(0,1.1,12)
-bar_edge = np.arange(0,1.05,0.1)
+print(np.mean(before_array))
+print(np.mean(during_array))
+print(np.mean(after_array))
 
-print("The average coherence for new UMZs is ", np.mean(coherence_dist))
+y_array = np.abs([np.mean(before_array), np.mean(during_array), np.mean(after_array)])
+y_2_array = np.abs([np.mean(before_2_array), np.mean(during_2_array), np.mean(after_2_array)])
+y_4_array = np.abs([np.mean(before_4_array), np.mean(during_4_array), np.mean(after_4_array)])
 
-plt.subplot(2, 2, 1)
-new_hist = plt.hist(heights_dist, bins = bins_edge)
-plt.xlabel("Heights of new UMZs")
-plt.ylabel("Frequency")
-new_frequens = new_hist[0] #Gets the frequencies of the bins
-print(new_frequens)
+print(len(before_array))
+print(len(during_array))
+print(len(after_array))
 
-plt.subplot(2, 2, 2)
-all_hist = plt.hist(all_heights, bins = bins_edge)
-plt.xlabel("Heights of all UMZs")
-all_frequens = all_hist[0] #Gets the frequencies of the bins
-#print(all_frequens)
+plt.subplot(2,3,5)
+plt.scatter(['before', 'during', 'after'], y_array, marker = '_', s = 8000)
+plt.ylabel('Magnitude of average Quadrant event')
 
-percent_frequens = np.divide(new_frequens, all_frequens, out=np.zeros_like(new_frequens), where=all_frequens!=0) #Divides the frequencies except at /0
-plt.subplot(2, 2, 3)
-plt.bar(bar_edge, percent_frequens, align='edge', width = 0.1 )
-plt.xlabel("Heights of new UMZs")
-plt.ylabel("'%' of all UMZs that are new")
-#width=(bins_edge[1] - bins_edge[0])
+plt.subplot(2,3,1)
+plt.scatter(['before', 'during', 'after'], y_2_array, marker = '_', s = 8000)
+plt.ylabel('Magnitude of Q2 event')
 
-
-plt.subplot(2, 2, 4)
-coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,16,1))
-plt.xlabel("Coherence of new UMZs")
-plt.ylabel("Frequency")
-print(coherence_hist[0])
+plt.subplot(2,3,3)
+plt.scatter(['before', 'during', 'after'], y_4_array, marker = '_', s = 8000)
+plt.ylabel('Magnitude of Q4 event')
 
 
 plt.show()
 plt.close()
-
-
-#print("frames with wall creation: ", wall_labels)
-#print("frames with middle1 creation: ", middle1_labels)
