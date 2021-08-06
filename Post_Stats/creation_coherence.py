@@ -43,7 +43,7 @@ def find_counter_space():
 
 fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
 f = open (fname, mode = 'r')
-spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
+spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\spatial.txt'''
 s = open (spatial, mode = 'r')
 tol = 0.025
 heights_dist = []
@@ -69,7 +69,7 @@ for line in f:
         z_coord = int(z_coord[2:])
 
         for jj in range(len(tracker)):
-            if tracker[jj] != 0:
+            if counter[jj,1] > 0:
                 coherence_dist.append(counter[jj,1])
         counter[:,:] = 0
         tracker[:] = 0
@@ -97,7 +97,8 @@ for line in f:
                     counter[jj,1] += 1
                     tracker[jj] = find_nearest(peaks_current, tracker[jj])[1]
                 else:
-                    coherence_dist.append(counter[jj,1])
+                    if counter[jj,1] > 0:
+                        coherence_dist.append(counter[jj,1])
                     counter[jj,:] = 0
                     tracker[jj] = 0
 
@@ -114,7 +115,7 @@ for line in f:
             #if len(new_peaks)<1:
                 #new_peaks.append(np.abs(np.asarray(peaks_current) - np.asarray(nearest_old_peaks)).argmax()) #includes new close peaks
             
-            if len(new_peaks)==1: #If all other peaks are coherent
+            if len(new_peaks)==1: #If its a creation event if all other are coherent
                 heights_dist.append(new_heights[0])
                 new_space = find_counter_space()
                 counter[new_space,0] = new_peaks[0] #Init counter with first value
@@ -152,8 +153,9 @@ plt.xlabel("Heights of new UMZs")
 plt.xlabel("Percentage of all UMZs that are new")
 #width=(bins_edge[1] - bins_edge[0])
 
+
 plt.subplot(2, 2, 4)
-coherence_hist = plt.hist(coherence_dist)
+coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,16,1))
 plt.xlabel("Coherence of new UMZs")
 plt.ylabel("Frequency")
 print(coherence_hist[0])

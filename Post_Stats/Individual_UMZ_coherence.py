@@ -127,7 +127,7 @@ print(np.mean(coherent_velocities))
 print(np.mean(coherent_times))
 
 #plt.scatter(coherent_velocities, coherent_times, s=30)
-plt.hist2d(coherent_velocities, coherent_times, bins = 12)
+plt.hist2d(coherent_velocities, coherent_times, bins = 12, cmap = 'Reds')
 plt.xlabel("Streamwise Velocity",fontdict={'family' : 'Calibri', 'size':12})
 plt.ylabel("No. of Subsequent Frames",fontdict={'family' : 'Calibri', 'size':12})
 plt.title(" Temporal Coherence vs. Mean Velocity of UMZ ",fontdict={'family' : 'Calibri', 'size':12})
