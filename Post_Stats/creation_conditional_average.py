@@ -1,5 +1,5 @@
 # --- 
-# aims: reads data on number of UMZs and calcualtes where the new UMZs are created
+# aims: takes the first frame with new UMZs as creation event rather than before the new UMZs is seen
 # calls: none
 # modefication history: gmalik, July, 2021; 
 
@@ -47,6 +47,7 @@ spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\spatial.txt'''
 s = open (spatial, mode = 'r')
 quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\quadrant.txt'''
 q = open (quadrant, mode = 'r')
+
 tol = 0.025
 heights_dist = []
 all_heights = []

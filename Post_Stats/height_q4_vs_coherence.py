@@ -202,22 +202,22 @@ coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,17,1))
 plt.ylabel("requency")
 print(coherence_hist[0])
  
-plt.subplot(3, 5, 1)
+plt.subplot(3, 4, 1)
 all_vel_hist = plt.hist(all_vel)
 #plt.xlabel("Streamwise velocity of new UMZs")
 plt.ylabel("Total Frequency")
 
-plt.subplot(3, 5, 2)
+plt.subplot(3, 4, 2)
 all_height_hist = plt.hist(all_heights, bins = bins_edge)
 #plt.xlabel("Heights of new UMZs")
 
 
-plt.subplot(3, 5, 3)
+plt.subplot(3, 4, 3)
 all_spanwise_hist = plt.hist(all_spanwise)
 #plt.xlabel("Spanwise velocity of new UMZs")
 
 
-plt.subplot(3, 5, 4)
+plt.subplot(3, 4, 4)
 all_quad_hist = plt.hist(all_quadrant)
 #plt.xlabel("Quadrant event mag. of new UMZs")
 
@@ -226,20 +226,20 @@ all_quad_hist = plt.hist(all_quadrant)
 #all_event_hist = plt.hist(all_event)
 #plt.xlabel("Quadrant event name")
 
-plt.subplot(3, 5, 6)
+plt.subplot(3, 4, 5)
 new_vel_hist = plt.hist(new_vel_dist)
 #plt.xlabel("Streamwise velocity of new UMZs")
 plt.ylabel("Creation Frequency")
 
-plt.subplot(3, 5, 7)
+plt.subplot(3, 4, 6)
 new_height_hist = plt.hist(new_height_dist, bins = bins_edge)
 #plt.xlabel("Heights of new UMZs")
 
-plt.subplot(3, 5, 8)
+plt.subplot(3, 4, 7)
 new_vel_hist = plt.hist(new_spanwise_dist)
 #plt.xlabel("Spanwise velocity of new UMZs")
 
-plt.subplot(3, 5, 9)
+plt.subplot(3, 4, 8)
 new_vel_hist = plt.hist(new_quadrant_dist)
 #plt.xlabel("Quadrant event mag. of new UMZs")
 
@@ -249,20 +249,20 @@ new_vel_hist = plt.hist(new_quadrant_dist)
 
 
 
-plt.subplot(3, 5, 11)
+plt.subplot(3, 4, 9)
 plt.scatter(new_vel_dist, coherence_dist)
 plt.xlabel("Streamwise Velocity")
 plt.ylabel("Coherence")
 
-plt.subplot(3, 5, 12)
+plt.subplot(3, 4, 10)
 plt.scatter(new_height_dist, coherence_dist)
 plt.xlabel("Height")
 
-plt.subplot(3, 5, 13)
+plt.subplot(3, 4, 11)
 plt.scatter(new_spanwise_dist, coherence_dist)
 plt.xlabel("Spanwise velocity")
 
-plt.subplot(3, 5, 14)
+plt.subplot(3, 4, 12)
 plt.scatter(new_quadrant_dist, coherence_dist)
 plt.xlabel("Quadrant event mag.")
 
