@@ -55,7 +55,7 @@ all_vel = []
 all_heights = []
 all_spanwise = []
 all_quadrant = []
-
+all_event = []
 
 
 UMZ_order = []
@@ -64,10 +64,11 @@ peaks_current = []
 heights_current = []
 spanwise_current = []
 quadrant_current = 0
+event_current = 0
 
 counter = np.zeros((7,2))  #0: first recorded velocity / 1: # of frames
 tracker = np.zeros(7)
-hq_counter = np.zeros((7,3)) #0:Height 1:Spanwise 2:Quadrant creation events
+hq_counter = np.zeros((7,4)) #0:Height 1:Spanwise 2:Quadrant creation events
 
 coherence_dist = []
 
@@ -75,6 +76,7 @@ new_vel_dist = []
 new_height_dist = []
 new_spanwise_dist = []
 new_quadrant_dist = []
+new_event_dist = []
 
 for line in f:
     line_spat = s.readline()
@@ -93,6 +95,7 @@ for line in f:
                 new_height_dist.append(hq_counter[jj, 0])
                 new_spanwise_dist.append(hq_counter[jj,1])
                 new_quadrant_dist.append(hq_counter[jj,2])
+                new_event_dist.append(hq_counter[jj,3])
         counter[:,:] = 0
         tracker[:] = 0
         hq_counter[:,:] = 0
@@ -118,6 +121,13 @@ for line in f:
         
         quadrant_current = float(lst_quad[3])
         all_quadrant.append(quadrant_current)
+        event_current = lst_quad[5][1]
+        if event_current == 'o':
+            event_current = 0
+        else:
+            event_current = int(event_current)
+        all_event.append(event_current)
+
         UMZ_order.append(int(UMZs_str))
 
         #Put code here to check if anything in counter and check if the velocity closes to the value in the tracker is
@@ -135,6 +145,7 @@ for line in f:
                         new_height_dist.append(hq_counter[jj,0])
                         new_spanwise_dist.append(hq_counter[jj,1])
                         new_quadrant_dist.append(hq_counter[jj,2])
+                        new_event_dist.append(hq_counter[jj,3])
                     counter[jj,:] = 0
                     tracker[jj] = 0
                     hq_counter[jj,:] = 0
@@ -151,6 +162,7 @@ for line in f:
                     new_peaks.append(peaks_current[j])
                     new_heights.append(heights_current[j])
                     new_spanwise.append(spanwise_current[j])
+            """
             if len(new_peaks)<1:
                 far_peak_index = np.abs(np.asarray(peaks_current) - np.asarray(nearest_old_peaks)).argmax()
                 new_peaks.append(peaks_current[far_peak_index]) #includes new close peaks
@@ -158,7 +170,7 @@ for line in f:
                 new_spanwise.append(spanwise_current[far_peak_index])
                 if len(new_peaks) != 1:
                         print("Close peaks error")
-            
+            """
             if len(new_peaks)==1: #If all other peaks are coherent
                 new_space = find_counter_space()
                 counter[new_space,0] = new_peaks[0] #To find average of velocity
@@ -167,6 +179,7 @@ for line in f:
                 hq_counter[new_space,0] = new_heights[0] #Init counter with first value of x parameter
                 hq_counter[new_space,1] = new_spanwise[0]
                 hq_counter[new_space,2] = quadrant_current
+                hq_counter[new_space,3] = event_current
 
         
         peaks_old = peaks_current.copy()
@@ -174,6 +187,7 @@ for line in f:
         heights_current = []
         spanwise_current = []
         quadrant_current = 0
+        event_current = 0
 
 
 bins_edge = np.linspace(0,1.1,12)
@@ -182,74 +196,89 @@ bar_edge = np.arange(0.5,1.05,0.1)
 print("The average coherence for new UMZs is ", np.mean(coherence_dist))
 
 
-#plt.subplot(3, 4, 1)
+#plt.subplot(3, 5, 1)
 coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,17,1))
 plt.xlabel("Coherence of new UMZs")
 plt.ylabel("Frequency")
 print(coherence_hist[0])
 
 
-plt.subplot(3, 4, 1)
+plt.subplot(3, 5, 1)
 all_vel_hist = plt.hist(all_vel)
 plt.xlabel("Streamwise velocity of new UMZs")
 plt.ylabel("Frequency")
 
-plt.subplot(3, 4, 2)
+plt.subplot(3, 5, 2)
 all_height_hist = plt.hist(all_heights, bins = bins_edge)
 plt.xlabel("Heights of new UMZs")
 plt.ylabel("Frequency")
 
 
-plt.subplot(3, 4, 3)
+plt.subplot(3, 5, 3)
 all_spanwise_hist = plt.hist(all_spanwise)
 plt.xlabel("Spanwise velocity of new UMZs")
 plt.ylabel("Frequency")
 
 
-plt.subplot(3, 4, 4)
+plt.subplot(3, 5, 4)
 all_quad_hist = plt.hist(all_quadrant)
 plt.xlabel("Quadrant event mag. of new UMZs")
 plt.ylabel("Frequency")
 
+plt.subplot(3, 5, 5)
+all_event_hist = plt.hist(all_event)
+plt.xlabel("Quadrant event name")
+plt.ylabel("Frequency")
 
-plt.subplot(3, 4, 5)
+
+
+plt.subplot(3, 5, 6)
 new_vel_hist = plt.hist(new_vel_dist)
 plt.xlabel("Streamwise velocity of new UMZs")
 plt.ylabel("Frequency")
 
-plt.subplot(3, 4, 6)
+plt.subplot(3, 5, 7)
 new_height_hist = plt.hist(new_height_dist, bins = bins_edge)
 plt.xlabel("Heights of new UMZs")
 plt.ylabel("Frequency")
 
 
-plt.subplot(3, 4, 7)
+plt.subplot(3, 5, 8)
 new_vel_hist = plt.hist(new_spanwise_dist)
 plt.xlabel("Spanwise velocity of new UMZs")
 plt.ylabel("Frequency")
 
-plt.subplot(3, 4, 8)
+plt.subplot(3, 5, 9)
 new_vel_hist = plt.hist(new_quadrant_dist)
 plt.xlabel("Quadrant event mag. of new UMZs")
 plt.ylabel("Frequency")
 
+plt.subplot(3, 5, 10)
+new_vel_hist = plt.hist(new_event_dist)
+plt.xlabel("Quadrant event name of new UMZs")
+plt.ylabel("Frequency")
 
-plt.subplot(3, 4, 9)
+
+plt.subplot(3, 5, 11)
 plt.scatter(new_vel_dist, coherence_dist)
 plt.xlabel("Streamwise Velocity")
 plt.ylabel("Coherence")
 
-plt.subplot(3, 4, 10)
+plt.subplot(3, 5, 12)
 plt.scatter(new_height_dist, coherence_dist)
 plt.xlabel("Height")
 
-plt.subplot(3, 4, 11)
+plt.subplot(3, 5, 13)
 plt.scatter(new_spanwise_dist, coherence_dist)
 plt.xlabel("Spanwise velocity")
 
-plt.subplot(3, 4, 12)
+plt.subplot(3, 5, 14)
 plt.scatter(new_quadrant_dist, coherence_dist)
 plt.xlabel("Quadrant event mag.")
+
+plt.subplot(3, 5, 15)
+plt.scatter(new_event_dist, coherence_dist)
+plt.xlabel("Quadrant event name")
 
 plt.show()
 plt.close()
