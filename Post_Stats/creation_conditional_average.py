@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl 
 from num2words import num2words
-import copy
+import copy 
 
 # --------------------------------
 # find closest values
@@ -49,6 +49,8 @@ quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\quadrant.txt''
 q = open (quadrant, mode = 'r')
 
 tol = 0.025
+dt = 0.023
+
 heights_dist = []
 all_heights = []
 
@@ -158,6 +160,7 @@ for line in f:
         heights_current = []
         before = copy.deepcopy(quadrant_current)
 
+coherence_dist = np.array(coherence_dist) * dt
 
 print(np.mean(before_array))
 print(np.mean(during_array))

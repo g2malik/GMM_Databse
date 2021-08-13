@@ -133,7 +133,7 @@ print(percent_frequens)
 plt.subplot(2, 2, 3)
 plt.bar(bar_edge, percent_frequens, align='edge', width = 0.1 )
 plt.xlabel("Heights of new UMZs")
-plt.xlabel("Percentage of all UMZs that are new")
+plt.ylabel("'%' of all UMZs that are new")
 #width=(bins_edge[1] - bins_edge[0])
 
 

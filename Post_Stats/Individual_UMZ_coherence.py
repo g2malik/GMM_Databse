@@ -46,6 +46,7 @@ def find_counter_space():
 fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
 f = open (fname, mode = 'r')
 tol = 0.02
+dt = 0.023
 
 coherent_velocities = []
 coherent_times = []
@@ -123,12 +124,14 @@ for line in f:
         peaks_old = peaks_current.copy()
         peaks_current = []
 
+coherent_times = np.array(coherent_times) * dt
+
 print(np.mean(coherent_velocities))
 print(np.mean(coherent_times))
 
 #plt.scatter(coherent_velocities, coherent_times, s=30)
 plt.hist2d(coherent_velocities, coherent_times, bins = 12, cmap = 'Reds')
-plt.xlabel("Streamwise Velocity",fontdict={'family' : 'Calibri', 'size':12})
-plt.ylabel("No. of Subsequent Frames",fontdict={'family' : 'Calibri', 'size':12})
-plt.title(" Temporal Coherence vs. Mean Velocity of UMZ ",fontdict={'family' : 'Calibri', 'size':12})
+plt.xlabel(r'$U/U_{\infty}$',fontdict={'family' : 'Calibri', 'size':12})
+plt.ylabel(r'$\delta / u_{\tau}$',fontdict={'family' : 'Calibri', 'size':12})
+#plt.title(" Temporal Coherence vs. Mean Velocity of UMZ ",fontdict={'family' : 'Calibri', 'size':12})
 plt.show()

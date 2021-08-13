@@ -45,7 +45,10 @@ fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
 f = open (fname, mode = 'r')
 spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\spatial.txt'''
 s = open (spatial, mode = 'r')
+
 tol = 0.025
+dt = 0.023
+
 heights_dist = []
 all_heights = []
 
@@ -131,6 +134,8 @@ for line in f:
 bins_edge = np.linspace(0,1.1,12)
 bar_edge = np.arange(0,1.05,0.1)
 
+coherence_dist = np.array(coherence_dist) * dt
+
 print("The average coherence for new UMZs is ", np.mean(coherence_dist))
 
 plt.subplot(2, 2, 1)
@@ -153,10 +158,10 @@ plt.xlabel("Heights of new UMZs")
 plt.ylabel("'%' of all UMZs that are new")
 #width=(bins_edge[1] - bins_edge[0])
 
+plt.show()
 
-plt.subplot(2, 2, 4)
-coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,16,1))
-plt.xlabel("Coherence of new UMZs")
+coherence_hist = plt.hist(coherence_dist, bins = np.arange(0.023,0.368,0.023))
+plt.xlabel(r'$\delta / u_{\tau}$')
 plt.ylabel("Frequency")
 print(coherence_hist[0])
 
