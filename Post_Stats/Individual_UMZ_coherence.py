@@ -129,6 +129,7 @@ coherent_times = np.array(coherent_times) * dt
 print(np.mean(coherent_velocities))
 print(np.mean(coherent_times))
 
+figure(dpi = 200)
 #plt.scatter(coherent_velocities, coherent_times, s=30)
 plt.hist2d(coherent_velocities, coherent_times, bins = 12, cmap = 'Reds')
 plt.xlabel(r'$U/U_{\infty}$',fontdict={'family' : 'Calibri', 'size':12})

@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl 
 from num2words import num2words
+from matplotlib.pyplot import figure
 
 # --------------------------------
 # find closest values
@@ -160,6 +161,7 @@ plt.ylabel("'%' of all UMZs that are new")
 
 plt.show()
 
+figure(dpi = 200)
 coherence_hist = plt.hist(coherence_dist, bins = np.arange(0.023,0.368,0.023))
 plt.xlabel(r'$\delta / u_{\tau}$')
 plt.ylabel("Frequency")

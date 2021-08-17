@@ -174,15 +174,18 @@ print(len(before_array))
 print(len(during_array))
 print(len(after_array))
 
-plt.subplot(2,3,5)
-plt.scatter(['before', 'during', 'after'], y_array, marker = '_', s = 8000)
-plt.ylabel('Magnitude of average Quadrant event')
+#plt.subplot(2,3,5)
+#plt.scatter(['before', 'during', 'after'], y_array, marker = '_', s = 8000)
+#plt.ylabel('Magnitude of average Quadrant event')
 
-plt.subplot(2,3,1)
+plt.figure(dpi = 150)
+#plt.subplot(2,3,1)
 plt.scatter(['before', 'during', 'after'], y_2_array, marker = '_', s = 8000)
 plt.ylabel('Magnitude of Q2 event')
 
-plt.subplot(2,3,3)
+
+#plt.figure(dpi = 150)
+#plt.subplot(2,3,5)
 plt.scatter(['before', 'during', 'after'], y_4_array, marker = '_', s = 8000)
 plt.ylabel('Magnitude of Q4 event')
 

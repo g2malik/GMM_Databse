@@ -15,6 +15,9 @@ from num2words import num2words
 
 fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
 f = open (fname, mode = 'r')
+
+dt = 0.023
+
 one = []
 two = []
 three = []
@@ -48,9 +51,16 @@ for line in f:
 #print(np.mean(four))
 #print(np.mean(five))
 
-plt.plot([2,3,4,5, 6], [np.mean(two), np.mean(three), np.mean(four), np.mean(five), np.mean(six)])
+two = np.array(two) * dt
+three = np.array(three) * dt
+four = np.array(four) * dt
+five = np.array(five) * dt
+six = np.array(six) * dt
+
+
+plt.plot([2,3,4,5, 6], [np.mean(two), np.mean(three), np.mean(four), np.mean(five), np.mean(six)], color = 'k')
 plt.xlabel("# of UMZs",fontdict={'family' : 'Calibri', 'size':12})
 plt.xticks([2,3,4,5, 6])
-plt.ylabel("Average # of Subsequent Frames",fontdict={'family' : 'Calibri', 'size':12})
+plt.ylabel(r'$\delta / u_{\tau}$',fontdict={'family' : 'Calibri', 'size':12})
 #plt.title(" Temporal Coherence vs. # of UMZ ",fontdict={'family' : 'Calibri', 'size':12})
 plt.show()

@@ -197,7 +197,8 @@ bar_edge = np.arange(0.5,1.05,0.1)
 coherence_dist = np.array(coherence_dist) * dt 
 print("The average coherence for new UMZs is ", np.mean(coherence_dist))
 
-
+plt.figure(figsize = (8,2), dpi = 200)
+"""
 #plt.subplot(3, 5, 1)
 coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,17,1))
 #plt.xlabel("Coherence of new UMZs")
@@ -232,11 +233,13 @@ plt.subplot(3, 4, 5)
 new_vel_hist = plt.hist(new_vel_dist)
 #plt.xlabel("Streamwise velocity of new UMZs")
 plt.ylabel("Creation Frequency")
-
-plt.subplot(3, 4, 6)
+"""
+plt.figure(dpi = 200)
+#plt.subplot(1, 2, 1)
 new_height_hist = plt.hist(new_height_dist, bins = bins_edge)
-#plt.xlabel("Heights of new UMZs")
-
+plt.xlabel(r'$y/\delta$')
+plt.ylabel("Frequency")
+"""
 plt.subplot(3, 4, 7)
 new_vel_hist = plt.hist(new_spanwise_dist)
 #plt.xlabel("Spanwise velocity of new UMZs")
@@ -255,11 +258,13 @@ plt.subplot(3, 4, 9)
 plt.scatter(new_vel_dist, coherence_dist)
 plt.xlabel(r'$U/U_{\infty}$')
 plt.ylabel(r'$\delta / u_{\tau}$')
-
-plt.subplot(3, 4, 10)
+"""
+#plt.subplot(1, 2, 2)
+plt.figure(dpi = 200)
 plt.scatter(new_height_dist, coherence_dist)
 plt.xlabel(r'$y/\delta$')
-
+plt.ylabel(r'$\delta / u_{\tau}$')
+"""
 plt.subplot(3, 4, 11)
 plt.scatter(new_spanwise_dist, coherence_dist)
 plt.xlabel(r'$V/V_{\infty}$')
@@ -267,7 +272,7 @@ plt.xlabel(r'$V/V_{\infty}$')
 plt.subplot(3, 4, 12)
 plt.scatter(new_quadrant_dist, coherence_dist)
 plt.xlabel("Quadrant event mag.")
-
+"""
 #plt.subplot(3, 5, 15)
 #plt.scatter(new_event_dist, coherence_dist)
 #plt.xlabel("Quadrant event name")
