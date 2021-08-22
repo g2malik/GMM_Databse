@@ -21,9 +21,9 @@ def find_nearest(array, value):
 # --------------------------------
 # main
 
-fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
+fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
 f = open (fname, mode = 'r')
-spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\spatial.txt'''
+spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\spatial.txt'''
 s = open (spatial, mode = 'r')
 tol = 0.025
 heights_dist = []

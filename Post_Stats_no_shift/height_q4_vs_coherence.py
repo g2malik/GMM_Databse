@@ -41,11 +41,11 @@ def find_counter_space():
 # --------------------------------
 # main
 
-gaussian = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\gaussian.txt'''
+gaussian = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
 f = open (gaussian, mode = 'r')
-spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\spatial.txt'''
+spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\spatial.txt'''
 s = open (spatial, mode = 'r')
-quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\quadrant.txt'''
+quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\quadrant.txt'''
 q = open (quadrant, mode = 'r')
 
 

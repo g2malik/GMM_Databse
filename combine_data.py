@@ -11,12 +11,12 @@ import os
 import sys
 # --------------------------------
 
-data_types = ['gaussian', 'quadrant', 'spatial']
+data_types = ['Gaussian', 'Quadrant', 'Spatial']
 start_time = 0
 no_files = 0
 for type in data_types:
-    path = r'''C:\Users\gagan\Documents\Work\Results\GMM Database'''
-    wfile = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\%s.txt'''%(type)
+    path = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift'''
+    wfile = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\%s.txt'''%(type)
     w = open (wfile, mode = 'w')
     
     for x in range(1,4):
