@@ -21,9 +21,9 @@ def find_nearest(array, value):
 # --------------------------------
 # main
 
-fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
+fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\gaussian.txt'''
 f = open (fname, mode = 'r')
-spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\spatial.txt'''
+spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\spatial.txt'''
 s = open (spatial, mode = 'r')
 tol = 0.025
 heights_dist = []
@@ -111,8 +111,8 @@ print(random)
 
 bins_edge = np.linspace(0,1.1,12)
 bar_edge = np.arange(0.1,1.05,0.1)
-print(bins_edge)
-print(bar_edge)
+#print(bins_edge)
+#print(bar_edge)
 test= np.ones(27)
 
 plt.subplot(2, 2, 1)
@@ -123,19 +123,20 @@ new_frequens = new_hist[0] #Gets the frequencies of the bins
 #print(new_frequens)
 
 plt.subplot(2, 2, 2)
-all_hist = plt.hist(all_heights)
+all_hist = plt.hist(all_heights, bins=bins_edge)
 plt.xlabel("Heights of all UMZs")
 all_frequens = all_hist[0] #Gets the frequencies of the bins
 #print(all_frequens)
 
-#percent_frequens = np.divide(new_frequens, all_frequens, out=np.zeros_like(new_frequens), where=all_frequens!=0) #Divides the frequencies except at /0
+"""
+percent_frequens = np.divide(new_frequens, all_frequens, out=np.zeros_like(new_frequens), where=all_frequens!=0) #Divides the frequencies except at /0
 #print(percent_frequens)
-#plt.subplot(2, 2, 3)
-#plt.bar(bar_edge, percent_frequens, align='edge', width = 0.1 )
-#plt.xlabel("Heights of new UMZs")
-#plt.ylabel("'%' of all UMZs that are new")
-#width=(bins_edge[1] - bins_edge[0])
-
+plt.subplot(2, 2, 3)
+plt.bar(bar_edge, percent_frequens, align='edge', width = 0.1 )
+plt.xlabel("Heights of new UMZs")
+plt.ylabel("'%' of all UMZs that are new")
+width=(bins_edge[1] - bins_edge[0])
+"""
 
 plt.show()
 plt.close()

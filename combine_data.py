@@ -15,8 +15,8 @@ data_types = ['Gaussian', 'Quadrant', 'Spatial']
 start_time = 0
 no_files = 0
 for type in data_types:
-    path = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift'''
-    wfile = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\%s.txt'''%(type)
+    path = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2'''
+    wfile = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\%s.txt'''%(type)
     w = open (wfile, mode = 'w')
     
     for x in range(1,4):

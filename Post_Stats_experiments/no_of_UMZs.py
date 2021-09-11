@@ -1,5 +1,5 @@
 # --- 
-# aims: reads data on number of UMZs and gives a list of the number of frames a particular number of UMZs lasts
+# aims: Gives the average number of UMZs in the data and its distribution
 # calls: none
 # modefication history: gmalik, July, 2021; 
 
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl 
 # --------------------------------
 
-fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
+fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\gaussian.txt'''
 f = open (fname, mode = 'r')
 
 dt = 0.023

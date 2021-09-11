@@ -1,5 +1,5 @@
 # --- 
-# aims: reads data on number of UMZs and calcualtes where the new UMZs are created
+# aims: calcultes the pdf of U, V, Height, Q2/4 magnitude at creation events and plots the parameters vs. coherence
 # calls: none
 # modefication history: gmalik, July, 2021; 
 
@@ -41,11 +41,11 @@ def find_counter_space():
 # --------------------------------
 # main
 
-gaussian = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
+gaussian = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\gaussian.txt'''
 f = open (gaussian, mode = 'r')
-spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\spatial.txt'''
+spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\spatial.txt'''
 s = open (spatial, mode = 'r')
-quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\quadrant.txt'''
+quadrant = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\quadrant.txt'''
 q = open (quadrant, mode = 'r')
 
 
@@ -131,9 +131,6 @@ for line in f:
 
         UMZ_order.append(int(UMZs_str))
 
-        #Put code here to check if anything in counter and check if the velocity closes to the value in the tracker is
-        #within tolerance. Then add 1 otherwise end counter and record number of frames
-
         for jj in range(len(tracker)):
             if tracker[jj] != 0: #If tracking at this place holder
                 if np.abs(tracker[jj] - find_nearest(peaks_current, tracker[jj])[1]) < tol: #If peak in current coherent with tracker
@@ -163,7 +160,7 @@ for line in f:
                     new_peaks.append(peaks_current[j])
                     new_heights.append(heights_current[j])
                     new_spanwise.append(spanwise_current[j])
-            """
+            """ If you want to check cases where all peaks are within tol but one extra peak
             if len(new_peaks)<1:
                 far_peak_index = np.abs(np.asarray(peaks_current) - np.asarray(nearest_old_peaks)).argmax()
                 new_peaks.append(peaks_current[far_peak_index]) #includes new close peaks
@@ -197,13 +194,26 @@ bar_edge = np.arange(0.5,1.05,0.1)
 coherence_dist = np.array(coherence_dist) * dt 
 print("The average coherence for new UMZs is ", np.mean(coherence_dist))
 
-plt.figure(figsize = (8,2), dpi = 200)
-"""
-#plt.subplot(3, 5, 1)
-coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,17,1))
-#plt.xlabel("Coherence of new UMZs")
+""" Figures to only investigate height
+plt.figure(dpi = 200)
+new_height_hist = plt.hist(new_height_dist)
+plt.xlabel(r'$y/\delta$')
 plt.ylabel("Frequency")
-print(coherence_hist[0])
+
+plt.figure(dpi = 200)
+plt.scatter(new_height_dist, coherence_dist)
+plt.xlabel(r'$y/\delta$')
+plt.ylabel(r'$\delta / u_{\tau}$')
+"""
+
+
+#plt.figure(figsize = (8,2), dpi = 200)
+
+#plt.subplot(3, 5, 1)
+#coherence_hist = plt.hist(coherence_dist, bins = np.arange(1,17,1))
+#plt.xlabel("Coherence of new UMZs")
+#plt.ylabel("Frequency")
+#print(coherence_hist[0])
  
 plt.subplot(3, 4, 1)
 all_vel_hist = plt.hist(all_vel)
@@ -233,38 +243,36 @@ plt.subplot(3, 4, 5)
 new_vel_hist = plt.hist(new_vel_dist)
 #plt.xlabel("Streamwise velocity of new UMZs")
 plt.ylabel("Creation Frequency")
-"""
-plt.figure(dpi = 200)
-#plt.subplot(1, 2, 1)
+
+#plt.figure(dpi = 200)
+plt.subplot(3, 4, 6)
 new_height_hist = plt.hist(new_height_dist)
-plt.xlabel(r'$y/\delta$')
-plt.ylabel("Frequency")
-"""
+#plt.xlabel(r'$y/\delta$')
+#plt.ylabel("Frequency")
+
 plt.subplot(3, 4, 7)
-new_vel_hist = plt.hist(new_spanwise_dist)
+new_spanwise_hist = plt.hist(new_spanwise_dist)
 #plt.xlabel("Spanwise velocity of new UMZs")
 
 plt.subplot(3, 4, 8)
-new_vel_hist = plt.hist(new_quadrant_dist)
+new_quadrant_hist = plt.hist(new_quadrant_dist)
 #plt.xlabel("Quadrant event mag. of new UMZs")
 
 #plt.subplot(3, 5, 10)
 #new_vel_hist = plt.hist(new_event_dist)
 #plt.xlabel("Quadrant event name of new UMZs")
 
-
-
 plt.subplot(3, 4, 9)
 plt.scatter(new_vel_dist, coherence_dist)
 plt.xlabel(r'$U/U_{\infty}$')
 plt.ylabel(r'$\delta / u_{\tau}$')
-"""
-#plt.subplot(1, 2, 2)
-plt.figure(dpi = 200)
+
+plt.subplot(3, 4, 10)
+#plt.figure(dpi = 200)
 plt.scatter(new_height_dist, coherence_dist)
 plt.xlabel(r'$y/\delta$')
-plt.ylabel(r'$\delta / u_{\tau}$')
-"""
+#plt.ylabel(r'$\delta / u_{\tau}$')
+
 plt.subplot(3, 4, 11)
 plt.scatter(new_spanwise_dist, coherence_dist)
 plt.xlabel(r'$V/V_{\infty}$')
@@ -272,7 +280,7 @@ plt.xlabel(r'$V/V_{\infty}$')
 plt.subplot(3, 4, 12)
 plt.scatter(new_quadrant_dist, coherence_dist)
 plt.xlabel("Quadrant event mag.")
-"""
+
 #plt.subplot(3, 5, 15)
 #plt.scatter(new_event_dist, coherence_dist)
 #plt.xlabel("Quadrant event name")

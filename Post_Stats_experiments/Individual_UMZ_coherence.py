@@ -1,5 +1,5 @@
 # --- 
-# aims: reads data on number of UMZs and calcualtes how long individual UMZs are coherent for
+# aims: calculates how long all invidivual UMZs are coherent vs. their height
 # calls: none
 # modefication history: gmalik, July, 2021; 
 
@@ -43,7 +43,7 @@ def find_counter_space():
 # --------------------------------
 # main
 
-fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
+fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\gaussian.txt'''
 f = open (fname, mode = 'r')
 tol = 0.02
 dt = 0.023

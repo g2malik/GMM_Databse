@@ -1,5 +1,5 @@
 # --- 
-# aims: reads data on number of UMZs and calcualtes where the new UMZs are created
+# aims: Gives the pdf of the coherence of the creation events
 # calls: none
 # modefication history: gmalik, July, 2021; 
 
@@ -42,9 +42,9 @@ def find_counter_space():
 # --------------------------------
 # main
 
-fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\gaussian.txt'''
+fname = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\gaussian.txt'''
 f = open (fname, mode = 'r')
-spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\no_x_shift\spatial.txt'''
+spatial = r'''C:\Users\gagan\Documents\Work\Results\GMM Database\band2\spatial.txt'''
 s = open (spatial, mode = 'r')
 
 tol = 0.025
@@ -92,9 +92,6 @@ for line in f:
             all_heights.append(float(lst2[ii]))
         UMZ_order.append(int(UMZs_str))
 
-        #Put code here to check if anything in counter and check if the velocity closes to the value in the tracker is
-        #within tolerance. Then add 1 otherwise end counter and record number of frames
-
         for jj in range(len(tracker)):
             if tracker[jj] != 0: #If tracking at this place holder
                 if np.abs(tracker[jj] - find_nearest(peaks_current, tracker[jj])[1]) < tol: #If peak in current coherent with tracker
@@ -139,6 +136,14 @@ coherence_dist = np.array(coherence_dist) * dt
 
 print("The average coherence for new UMZs is ", np.mean(coherence_dist))
 
+coherence_hist = plt.hist(coherence_dist, bins = np.arange(0.023,0.368,0.023))
+plt.xlabel(r'$\delta / u_{\tau}$')
+plt.ylabel("Frequency")
+print(coherence_hist[0])
+plt.show()
+plt.close()
+
+""" Plots that give the location of creation events and divide the histogram by the location of all UMZs
 plt.subplot(2, 2, 1)
 new_hist = plt.hist(heights_dist, bins = bins_edge)
 plt.xlabel("Heights of new UMZs")
@@ -161,15 +166,7 @@ plt.ylabel("'%' of all UMZs that are new")
 
 plt.show()
 
-figure(dpi = 200)
-coherence_hist = plt.hist(coherence_dist, bins = np.arange(0.023,0.368,0.023))
-plt.xlabel(r'$\delta / u_{\tau}$')
-plt.ylabel("Frequency")
-print(coherence_hist[0])
-
-
-plt.show()
-plt.close()
+"""
 
 
 #print("frames with wall creation: ", wall_labels)
