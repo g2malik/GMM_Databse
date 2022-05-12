@@ -85,7 +85,7 @@ class kde_plus_gmm():
         self.peaks_g = M_best.predict_proba(np.reshape(self.means_g, (-1, 1)))
         self.peaks_g = self.peaks_g.max(axis = 1)
         
-        """
+        
         rsl = 500
         bins = binbin
         figure(figsize=(6.0, 4.0), dpi=rsl)
@@ -167,7 +167,7 @@ class kde_plus_gmm():
         plt.close()
         
         
-
+        """
         # ============ plot BIC/AIC ============
         figure(num=10, figsize=(7.0, 4.0), dpi=rsl)        
         plt.plot(AIC)
